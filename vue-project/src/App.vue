@@ -1,8 +1,5 @@
 <template>
   <v-app id="main">
-    <div class="mt-10" align="center">
-    <h1>Calendar for Team DevOps</h1>
-    </div>
     <v-main>
       <HelloWorld/>
     </v-main>
@@ -32,5 +29,13 @@ export default {
 		width: 90vw;
 		margin-left: auto;
 		margin-right: auto;
-	}
+}
+#bb{
+  font-weight: 500;
+  font-size: 40px;
+}
+#ss{
+  font-weight: 500;
+  font-size: 25px;
+}
 </style>
