@@ -1,151 +1,92 @@
 <template>
-  <v-container>
-    <v-row class="text-center">
-      <v-col cols="12">
-        <v-img
-          :src="require('../assets/logo.svg')"
-          class="my-3"
-          contain
-          height="200"
-        />
-      </v-col>
-
-      <v-col class="mb-4">
-        <h1 class="display-2 font-weight-bold mb-3">
-          Welcome to Vuetify
-        </h1>
-
-        <p class="subheading font-weight-regular">
-          For help and collaboration with other Vuetify developers,
-          <br>please join our online
-          <a
-            href="https://community.vuetifyjs.com"
-            target="_blank"
-          >Discord Community</a>
-        </p>
-      </v-col>
-
-      <v-col
-        class="mb-5"
-        cols="12"
+  <div>
+    <v-sheet
+      tile
+      height="54"
+      class="d-flex"
+    >
+      <v-btn
+        icon
+        class="ma-2"
+        @click="$refs.calendar.prev()"
       >
-        <h2 class="headline font-weight-bold mb-3">
-          What's next?
-        </h2>
-
-        <v-row justify="center">
-          <a
-            v-for="(next, i) in whatsNext"
-            :key="i"
-            :href="next.href"
-            class="subheading mx-3"
-            target="_blank"
-          >
-            {{ next.text }}
-          </a>
-        </v-row>
-      </v-col>
-
-      <v-col
-        class="mb-5"
-        cols="12"
+        <v-icon>mdi-chevron-left</v-icon>
+      </v-btn>
+      <v-spacer></v-spacer>
+      <v-btn
+        icon
+        class="ma-2"
+        @click="$refs.calendar.next()"
       >
-        <h2 class="headline font-weight-bold mb-3">
-          Important Links
-        </h2>
-
-        <v-row justify="center">
-          <a
-            v-for="(link, i) in importantLinks"
-            :key="i"
-            :href="link.href"
-            class="subheading mx-3"
-            target="_blank"
-          >
-            {{ link.text }}
-          </a>
-        </v-row>
-      </v-col>
-
-      <v-col
-        class="mb-5"
-        cols="12"
-      >
-        <h2 class="headline font-weight-bold mb-3">
-          Ecosystem
-        </h2>
-
-        <v-row justify="center">
-          <a
-            v-for="(eco, i) in ecosystem"
-            :key="i"
-            :href="eco.href"
-            class="subheading mx-3"
-            target="_blank"
-          >
-            {{ eco.text }}
-          </a>
-        </v-row>
-      </v-col>
-    </v-row>
-  </v-container>
+        <v-icon>mdi-chevron-right</v-icon>
+      </v-btn>
+    </v-sheet>
+    <v-sheet height="600">
+      <v-calendar
+        ref="calendar"
+        v-model="value"
+        :weekdays="weekday"
+        :type="type"
+        :events="events"
+        :event-overlap-mode="mode"
+        :event-overlap-threshold="30"
+        :event-color="getEventColor"
+        @change="getEvents"
+      ></v-calendar>
+    </v-sheet>
+  </div>
 </template>
 
 <script>
   export default {
     name: 'HelloWorld',
-
     data: () => ({
-      ecosystem: [
-        {
-          text: 'vuetify-loader',
-          href: 'https://github.com/vuetifyjs/vuetify-loader',
-        },
-        {
-          text: 'github',
-          href: 'https://github.com/vuetifyjs/vuetify',
-        },
-        {
-          text: 'awesome-vuetify',
-          href: 'https://github.com/vuetifyjs/awesome-vuetify',
-        },
+      type: 'month',
+      types: ['month', 'week', 'day', '4day'],
+      mode: 'stack',
+      modes: ['stack', 'column'],
+      weekday: [1, 2, 3, 4, 5, 6, 0],
+      weekdays: [
+        { text: 'Mon - Sun', value: [1, 2, 3, 4, 5, 6, 0] },
       ],
-      importantLinks: [
-        {
-          text: 'Documentation',
-          href: 'https://vuetifyjs.com',
-        },
-        {
-          text: 'Chat',
-          href: 'https://community.vuetifyjs.com',
-        },
-        {
-          text: 'Made with Vuetify',
-          href: 'https://madewithvuejs.com/vuetify',
-        },
-        {
-          text: 'Twitter',
-          href: 'https://twitter.com/vuetifyjs',
-        },
-        {
-          text: 'Articles',
-          href: 'https://medium.com/vuetify',
-        },
-      ],
-      whatsNext: [
-        {
-          text: 'Explore components',
-          href: 'https://vuetifyjs.com/components/api-explorer',
-        },
-        {
-          text: 'Select a layout',
-          href: 'https://vuetifyjs.com/getting-started/pre-made-layouts',
-        },
-        {
-          text: 'Frequently Asked Questions',
-          href: 'https://vuetifyjs.com/getting-started/frequently-asked-questions',
-        },
-      ],
+      value: '',
+      events: [],
+      colors: ['#FF5C4D', '#FF9636', '#FFCD58', '#DAD870'],
+      names: ['김나현님 재택', '김수람님 재택', '권은님 휴가', '허예슬님 공가', '안태영님 재택', '김유민님 재택', '정소윤님 재택'],
     }),
+    methods: {
+      getEvents ({ start, end }) {
+        const events = []
+
+        const min = new Date(`${start.date}T00:00:00`)
+        const max = new Date(`${end.date}T23:59:59`)
+        const days = (max.getTime() - min.getTime()) / 86400000
+        const eventCount = this.rnd(days, days + 20)
+
+        for (let i = 0; i < eventCount; i++) {
+          const allDay = this.rnd(0, 3) === 0
+          const firstTimestamp = this.rnd(min.getTime(), max.getTime())
+          const first = new Date(firstTimestamp - (firstTimestamp % 900000))
+          const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000
+          const second = new Date(first.getTime() + secondTimestamp)
+
+          events.push({
+            name: this.names[this.rnd(0, this.names.length - 1)],
+            start: first,
+            end: second,
+            color: this.colors[this.rnd(0, this.colors.length - 1)],
+            timed: !allDay,
+          })
+        }
+
+        this.events = events
+      },
+      getEventColor (event) {
+        return event.color
+      },
+      rnd (a, b) {
+        return Math.floor((b - a + 1) * Math.random()) + a
+      },
+    },
   }
 </script>
