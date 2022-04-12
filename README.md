@@ -8,3 +8,7 @@
     - @vue/cli 5.0.4
     - vue version v16.14.2
     - docker.x86_64 0:20.10.7-5.amzn2
+
+
+docker build -t vuef:dev .
+docker run -it -p 8080:8080 --rm vuef:dev
